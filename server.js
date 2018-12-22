@@ -1,5 +1,5 @@
 const { ApolloServer, gql } = require('apollo-server');
-const {query,commentMutation,addLabelToIssue} = require('./app');
+const {query,commentMutation,addLabelToIssue,commentAndLabel} = require('./app');
 // Type definitions define the "shape" of your data and specify
 // which ways the data can be fetched from the GraphQL server.
 const typeDefs = gql`
@@ -26,7 +26,7 @@ const typeDefs = gql`
   type Mutation {
     addComment(version: String!): String,
     addLabel(label: String!) : String
-   
+    addCommentAndLabel(id: String!,result:String!,version: String!): String,
   }
 
 `;
@@ -47,6 +47,10 @@ const resolvers = {
       const data = await addLabelToIssue()
         return "data";
       },
+      addCommentAndLabel:async(root, args) => {
+        const data = await commentAndLabel(args.version,args.id,args.result);
+          return "data";
+        },
   },
 };
 

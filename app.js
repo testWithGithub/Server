@@ -33,18 +33,14 @@ const query =async ()=>{
     return data
 }
 const octokit = new Octokit()
-// octokit.authenticate({
-//   type: 'basic',
-//   username: 'maty21',
-//   password: 'Mmki8ki8'
-// })
+
 octokit.authenticate({
   type: 'oauth',
-  token: ''
+  token: '152645882dea5cdb43d767e254e20cc591679e20'
 })
-const commentMutation =async (version) =>{
+const commentMutation =async (id,version,result) =>{
   const { data } = await graphql(`mutation {
-    addComment(input:{clientMutationId: "2", subjectId: "MDU6SXNzdWUzODkwNTExNDQ=", body: "${version}"}) {
+    addComment(input:{clientMutationId: "2", subjectId:"${id}" , body: "#### version:\n ${version}\n  #### result:\n  ${result}"\n}) {
       clientMutationId
       commentEdge {
         node {
@@ -62,39 +58,12 @@ const commentMutation =async (version) =>{
     }
   }`,{
     headers: {
-      authorization: `token `
+      authorization: `token 152645882dea5cdb43d767e254e20cc591679e20`
     }
 })
 return data
 }
-const commentMutation1 =async (version) =>{
-  try {
-    const { data } = await client.request(`mutation {
-      addComment(input:{clientMutationId: "2", subjectId: "MDU6SXNzdWUzODkwNTExNDQ=", body: "${version}"}) {
-        clientMutationId
-        commentEdge {
-          node {
-            body
-            repository {
-              id
-              name
-              nameWithOwner
-            }
-            issue {
-              number
-            }
-          }
-        }
-      }
-    }`
-  )
-  return data
-  } catch (error) {
-    console.log(error);
-    
-  }
-  
-}
+
 //f8fed92a11c7b0bee9a4de7a87d167b04e3eff81
 
 
@@ -143,8 +112,13 @@ const addLabelToIssue = async(issueId,version,label) => {
   }
 }
 
+commentAndLabel = async(version,id,result)=>{
+  commentMutation(id,version,result)
+
+}
       module.exports = {
         query :queryApi,
         commentMutation:commentMutation,
-        addLabelToIssue
+        addLabelToIssue,
+        commentAndLabel
       }
