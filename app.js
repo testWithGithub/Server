@@ -27,7 +27,7 @@ const query =async ()=>{
     }
     }`,{
         headers: {
-          authorization: `token 052645882dea5cdb43d767e254e20cc591679e20`
+          authorization: `token 152645882dea5cdb43d767e254e20cc591679e20`
         }
     })
     return data
