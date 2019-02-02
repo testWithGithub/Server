@@ -1,9 +1,10 @@
 const graphql = require('@octokit/graphql');
 const Octokit = require('@octokit/rest');
+const axios = require('axios');
 const { request, GraphQLClient } = require('graphql-request');
 //https://api.github.com/graphql
-const client = new GraphQLClient('https://api.github.com/graphql', { headers: { authorization: `token 4dd3a40b11d0e39736852dc8969a702269e3f48e`} })
-const query =async ()=>{
+const token ='052645882dea5cdb43d767e254e20cc591679e20'
+const query =async (atoken)=>{
     const { data } = await graphql(`{ repository(owner:"maty21" name:"test"){
         issues(last:100){
         edges{
@@ -27,7 +28,7 @@ const query =async ()=>{
     }
     }`,{
         headers: {
-          authorization: `token 152645882dea5cdb43d767e254e20cc591679e20`
+          authorization: `token ${atoken}`
         }
     })
     return data
@@ -36,7 +37,7 @@ const octokit = new Octokit()
 
 octokit.authenticate({
   type: 'oauth',
-  token: '152645882dea5cdb43d767e254e20cc591679e20'
+  token
 })
 const commentMutation =async (id,version,result) =>{
   const { data } = await graphql(`mutation {
@@ -58,7 +59,7 @@ const commentMutation =async (id,version,result) =>{
     }
   }`,{
     headers: {
-      authorization: `token 152645882dea5cdb43d767e254e20cc591679e20`
+      authorization: `token ${token}`
     }
 })
 return data
@@ -88,9 +89,9 @@ const getObjectFromData = (query)=>{
   
 }
 
-const queryApi = async() =>{
+const queryApi = async(token) =>{
   try {
-    const data = await query();
+    const data = await query(token);
     const res = getObjectFromData(data);
     console.log(res)
     return res;   
@@ -116,9 +117,35 @@ commentAndLabel = async(version,id,result)=>{
   commentMutation(id,version,result)
 
 }
+
+const getUserDetails = async(token)=> {
+  try {
+      let obj = new Octokit();
+      obj.authenticate({
+          type: 'app',
+          token
+      })
+   //   const repos = await obj.repos.getAll();
+      const userDetails = await axios.get(`https://api.github.com/user?access_token=${token}`)
+      const { name, login, avatar_url,organizations_url,repos_url } = userDetails.data;
+      const repos = await axios.get(repos_url);
+      //     console.log(repos);
+      //  const specificRepo = await obj.repos.get({ owner: repos.data[0].owner.login, repo: repos.data[0].name });
+      //    console.log(specificRepo);
+      return (
+          {
+             name, login, avatar_url 
+             // repos: repos.data.map(r => r.full_name)
+          })
+  } catch (error) {
+      console.log(error);
+  }
+}
+
       module.exports = {
         query :queryApi,
         commentMutation:commentMutation,
         addLabelToIssue,
-        commentAndLabel
+        commentAndLabel,
+        getUserDetails
       }
