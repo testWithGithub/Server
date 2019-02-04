@@ -1,10 +1,10 @@
 const { ApolloServer, gql } = require('apollo-server-express');
-const express =require('express');
+const express = require('express');
 const randomString = require('randomstring');
 const qs = require('querystring');
 const redirect_uri = 'http://localhost:3000' + '/api/github/callback';
-const {query,commentMutation,addLabelToIssue,commentAndLabel,getUserDetails} = require('./app');
-const  githubAuth = require("./github-oauth");
+const { query, commentMutation, addLabelToIssue, commentAndLabel, getUserDetails } = require('./app');
+const githubAuth = require("./github-oauth");
 
 const api = require('./api');
 // Type definitions define the "shape" of your data and specify
@@ -49,28 +49,28 @@ const typeDefs = gql`
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
   Query: {
-    issues: async(root, args) => {
-      const data =await query(args.token);
+    issues: async (root, args) => {
+      const data = await query(args.token);
       return data;
     },
-    userDetails: async(root, args) => {
-      const data =await getUserDetails(args.token);
+    userDetails: async (root, args) => {
+      const data = await getUserDetails(args.token);
       return data;
     }
   },
   Mutation: {
-    addComment: async(root, args) => {
-    const data = await commentMutation(args.version)
+    addComment: async (root, args) => {
+      const data = await commentMutation(args.version)
       return data;
     },
-    addLabel:async(root, args) => {
+    addLabel: async (root, args) => {
       const data = await addLabelToIssue()
-        return "data";
-      },
-      addCommentAndLabel:async(root, args) => {
-        const data = await commentAndLabel(args.version,args.id,args.result);
-          return "data";
-        }
+      return "data";
+    },
+    addCommentAndLabel: async (root, args) => {
+      const data = await commentAndLabel(args.version, args.id, args.result);
+      return "data";
+    }
   },
 };
 
@@ -78,13 +78,18 @@ const resolvers = {
 // by passing type definitions (typeDefs) and the resolvers
 // responsible for fetching the data for those types.
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  introspection: true,
+  playground: true,
+});
 
 const app = express();
-app.get('/github',(req,res)=>{
-  let data =githubAuth.login(req,res)
+app.get('/github', (req, res) => {
+  let data = githubAuth.login(req, res)
   console.log(data);
-  
+
 })
 app.use('/api', api);
 app.get('/login', (req, res) => {
@@ -102,7 +107,7 @@ app.get('/login', (req, res) => {
 });
 server.applyMiddleware({ app });
 
-const port = process.env.PORT||'4000';
+const port = process.env.PORT || '4000';
 
 app.listen({ port }, () =>
   console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`),
