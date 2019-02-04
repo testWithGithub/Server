@@ -5,7 +5,7 @@ const qs = require('querystring');
 const redirect_uri = 'http://localhost:3000' + '/api/github/callback';
 const { query, commentMutation, addLabelToIssue, commentAndLabel, getUserDetails } = require('./app');
 const githubAuth = require("./github-oauth");
-
+const cors = require('cors')
 const api = require('./api');
 // Type definitions define the "shape" of your data and specify
 // which ways the data can be fetched from the GraphQL server.
@@ -86,6 +86,7 @@ const server = new ApolloServer({
 });
 
 const app = express();
+app.use(cors());
 app.get('/github', (req, res) => {
   let data = githubAuth.login(req, res)
   console.log(data);
