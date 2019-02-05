@@ -1,14 +1,15 @@
 const express = require('express');
-const { addSession, getTasks, getTask } =  require('./data');
-const  githubAuth = require("./github-oauth");
+const { addSession, getTasks, getTask } = require('./data');
+const githubAuth = require("./github-oauth");
 const router = express.Router();
-const axios =require('axios')
+const axios = require('axios')
 const qs = require('querystring');
 const url = require('url');
 const randomString = require('randomstring');
 const githubApi = require('./github/github-api');
-
-const redirect_uri = 'http://localhost:3000' + '/api/github/callback';
+const clientUi = 'http://localhost:3000';
+const testServer = "https://test-ui.herokuapp.com";
+const redirect_uri = `${ testServer }/api/github/callback`;
 router.post('/sessions', (req, res) => {
   const { email, password } = req.body;
   if (!email || !password || email === 'error') {
@@ -27,22 +28,22 @@ router.post('/sessions', (req, res) => {
 
 router.get('/github', (req, res) => {
 
- let data =githubAuth.login(req,res)
- console.log(data);
- 
+  let data = githubAuth.login(req, res)
+  console.log(data);
+
 })
 
 router.get('/github/callback', (req, res) => {
-  return githubAuth.callback(req,res)
+  return githubAuth.callback(req, res)
 })
-router.post('/github/validate',async  (req, res) => {
+router.post('/github/validate', async (req, res) => {
   const { token } = req.body;
- const result = await githubApi.isValidate(token)
-  if(!result){
+  const result = await githubApi.isValidate(token)
+  if (!result) {
     res.status(404).end();
-    } else {
-      res.json(result);
-    }
+  } else {
+    res.json(result);
+  }
 })
 
 router.get('/login', (req, res) => {

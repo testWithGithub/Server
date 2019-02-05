@@ -4,8 +4,21 @@ const axios = require('axios');
 const { request, GraphQLClient } = require('graphql-request');
 //https://api.github.com/graphql
 const token = '052645882dea5cdb43d767e254e20cc591679e20'
+
+
+const getRopesByUser = async (owner = "maty21", repo = "test") => {
+  try {
+   // const result = await octokit.repos.get({ owner, repo })
+    const result = await octokit.issues.listForRepo({owner, repo,per_page:100})
+    console.log(result)
+    
+  } catch (error) {
+    console.log(error)
+    
+  }
+}
 const query = async (atoken) => {
-  const { data } = await graphql(`{ repository(owner:"maty21" name:"test"){
+  const data= await graphql(`{ repository(owner:"maty21" name:"test"){
         issues(last:100){
         edges{
           node{
@@ -41,6 +54,8 @@ const octokit = new Octokit({
 //   type: 'oauth',
 //   token
 // })
+
+
 const commentMutation = async (id, version, result) => {
   const { data } = await graphql(`mutation {
     addComment(input:{clientMutationId: "2", subjectId:"${id}" , body: "#### version:\n ${version}\n  #### result:\n  ${result}"\n}) {
@@ -93,6 +108,7 @@ const getObjectFromData = (query) => {
 
 const queryApi = async (token) => {
   try {
+    getRopesByUser();
     const data = await query(token);
     const res = getObjectFromData(data);
     console.log(res)
